@@ -4,10 +4,28 @@ var request = require('request')
   , _ = require('underscore');
 
 var FiveHundred = {
+  formatResponse: function(error, response, body) {
+    return true;
+  },
+
+  photo: function(options, callback) {
+    var url = config.url + "/photos/" + options.id
+    var qs = {
+      consumer_key: config.consumer_key
+    }
+    _.extend(qs, options);
+    console.log(qs);
+
+    request.get({
+      url: url,
+      qs: qs
+    }, callback);
+  },
+  
   photos: function(options, callback) {
     var url = config.url + "/photos";
     var qs = {
-      consumer_key: config.consumer_key,
+      consumer_key: config.consumer_key
     }
     _.extend(qs, options);
 

@@ -35,20 +35,28 @@ var GameController = function(player) {
 
   this.angle = function() {
     if (this.up && this.left) {
+      WorldMap.fire('moveMap', {up: true, left: true});
       return Math.PI + (Math.PI * 0.25);
     } else if (this.up && this.right) {
+      WorldMap.fire('moveMap', {up: true, right: true});
       return Math.PI * -0.25;
     } else if (this.down && this.left) {
+      WorldMap.fire('moveMap', {down: true, left: true});
       return Math.PI - (Math.PI * 0.25);
     } else if (this.down && this.right) {
+      WorldMap.fire('moveMap', {down: true, right: true});
       return Math.PI * 0.25;
     } else if (this.down) {
+      WorldMap.fire('moveMap', {down: true});
       return Math.PI * 0.5;
     } else if (this.left) {
+      WorldMap.fire('moveMap', {left: true});
       return Math.PI;
     } else if (this.up) {
+      WorldMap.fire('moveMap', {up: true});
       return Math.PI * 1.5;
     } else if (this.right) {
+      WorldMap.fire('moveMap', {right: true});
       return 0;
     }
     return null;
@@ -70,22 +78,20 @@ gamejs.utils.objects.extend(Wisp, gamejs.sprite.Sprite);
 
 Wisp.prototype.update = function(msDuration) {
     // Move the map when the player is near the bounding boxes.
-    if (this.rect.y < 10) {
-      WorldMap.fire('moveMap', {up: true});
-    }
-
     if (this.angle !== null) {
+      /*
       this.rect.moveIp(
           Math.cos(this.angle) * this.speed * (msDuration / 1000),
           Math.sin(this.angle) * this.speed * (msDuration / 1000)
       );
+      */
     }
 }
 
 var main = function() {
-  var display = gamejs.display.setMode([800, 600]);
+  var display = gamejs.display.setMode([80, 80]);
 
-  var wisp = new Wisp([200, 200]);
+  var wisp = new Wisp([0, 0]);
   var gameController = new GameController(wisp);
 
   var tick = function(msDuration) {
