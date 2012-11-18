@@ -352,8 +352,27 @@ a.button {
     width:436px;
     height:418px;
     top:0;
-    right:0;
+    right:-84px;
     position:fixed;
+}
+
+.bottom-left {
+    background:url('../img/graphx-20.png') no-repeat bottom left;
+    bottom:0;
+    left:0;
+    position: fixed;
+    width:571px;
+    height:441px;
+}
+
+.logo {
+    background:url('../img/graphx-21.png') no-repeat top left;
+    top:0;
+    left:0;
+    position: fixed;
+    width:503px;
+    height:378px;
+
 }
 
 input[type="button"] {
