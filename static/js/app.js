@@ -21,10 +21,6 @@
 
     initialize: function() {
       this.activeIndex = 0;
-
-      this.on('reset', function() {
-        console.log("Photos reset");
-      });
     },
 
     // Hacked image at a certain index
@@ -32,7 +28,7 @@
       // HACK. Replace the 2.jpg in the activeImage with 4.jpg. Is bigger
       var instance = this.at(index);
 
-      if (!instance) {
+      if (!instance || !instance.get('image_url')) {
         return null;
       }
 
@@ -54,11 +50,19 @@
     },
 
     nextImage: function() {
+      if (!this.imageAtIndex(this.activeIndex + 1)) {
+        return
+      }
+
       this.activeIndex += 1;
       return this.activeImage();
     },
 
     previousImage: function() {
+      if (!this.imageAtIndex(this.activeIndex - 1)) {
+        return
+      }
+
       this.activeIndex -= 1;
       return this.activeImage();
     }
@@ -72,7 +76,6 @@
 
     // Trigger events to move the image gallery. Change the activeImage.
     events: {
-
     },
 
     initialize: function(map) {
@@ -111,7 +114,7 @@
     },
 
     _clear: function() {
-      $(this.el).html("").hide();;
+      $(this.el).html("").hide("slow");
     },
 
     // Render a template that would display the gallery of images.
@@ -124,9 +127,8 @@
         nextImage: Photos.getNextImage(),
         previousImage: Photos.getPreviousImage()
       }
-      console.log(context);
       var template = _.template($(this.template).html());
-      $(this.el).html(template(context)).show();;
+      $(this.el).html(template(context)).show("slow");
     }
   });
 
@@ -181,7 +183,7 @@
         oY = 130, // origin
         r = 200; // radius
 
-      var photos = _.toArray(photos);
+      var photos = _.shuffle(_.toArray(photos));
       Photos.reset(photos);
 
       // lame hax!
@@ -309,7 +311,11 @@
   }
 
   App.init = function(options) {
-    var startLatLng = [43.6229206, -79.374900];
+    // Toronto
+    // var startLatLng = [43.6229206, -79.374900];
+
+    // New York
+    var startLatLng = [40.7305991, -73.9465812];
 
     App.WorldMap = map = L.map('map', {
       keyboard: false

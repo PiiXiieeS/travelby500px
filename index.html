@@ -3,7 +3,8 @@
   <head>
     <title> Travel By 500px </title>
      <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
-      <link href='http://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'>
+     <link href='http://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'>
+    
       <link rel="stylesheet" href="static/css/style.css" />
      <!--[if lte IE 8]>
      <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.ie.css" />
@@ -36,7 +37,7 @@
           <h1><%= activeImage.get('name') %></h1>
           <h3><%= activeImage.get('user').fullname %></h3>
           <div class='actions'>
-            <a href='http://500px.com/photo/<%= activeImage.get('id') %>'>View On 500px.com</a>
+            <a class='button' href='http://500px.com/photo/<%= activeImage.get('id') %>'>View On 500px.com</a>
           </div>
        </div>
      </div>

@@ -1,9 +1,9 @@
-
 html, body {
     height:100%;
     width:100%;
     padding:0;
     margin:0;
+    font-family: 'Inconsolata', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -108,11 +108,13 @@ p {
   text-align: center;
   height: 80px;
   width: 100%;
-  background-color: #eee;
+  background-color: #AD0316;
+  color: #fff;
 }
 
 #gallery-layer .info h1 {
   margin: 0;
+  margin-top: 5px;
 }
 
 #gallery-layer .info h3 {
@@ -122,9 +124,26 @@ p {
 #gallery-layer .actions {
   position: absolute;
   bottom: 0px;
-  left: 0;
+  left: 15px;
   height: 60px;
   width: 150px;
+}
+
+a.button {
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #006DCC;
+  background-image: -webkit-linear-gradient(top, #08C, #04C);
+  padding: 4px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+  vertical-align: middle;
+  border-radius: 4px;
+  border: 1px solid #7b0210;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 
