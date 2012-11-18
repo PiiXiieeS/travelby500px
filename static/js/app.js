@@ -14,12 +14,48 @@
 
   App.locations = [];
 
+  var PhotoModel = Backbone.Model.extend({});
+  // Should setup a collection of photos with thumbnail and primary sizes..
+  var PhotoCollection = Backbone.Collection.extend({
+    model: PhotoModel
+  });
+  var Photos = new PhotoCollection();
+
+  var GalleryLayer = L.Class.extend({
+    template: '#tm_gallery',
+
+    onAdd: function(map) {
+      this._map = map;
+
+      this._el = L.DomUtil.create('div', 'gallery-layer');
+
+      $(this._el).css("width", "800px");
+      map.getPanes().overlayPane.appendChild(this._el);
+
+      map.on('galleryEnter', this._draw, this);
+      map.on('galleryLeave', this._clear, this);
+    },
+
+    _clear: function() {
+      $(this._el).html("");
+    },
+
+    // Render a template that would display the gallery of images.
+    _draw: function() {
+      var context = {
+        images: Photos.models.slice(0, 6),
+        activeImage: Photos.at(0).toJSON()
+      }
+      var template = _.template($(this.template).html());
+      $(this._el).html(template(context));
+    }
+  });
+
   var PhotoLayer = L.Class.extend({
     onAdd: function(map) {
       this._map = map;
 
       this._el = L.DomUtil.create('div', 'photo-canvas')
-      // Make this work with gamejs
       this._el.setAttribute("id", "photo-canvas");
       this._el.setAttribute("height", "600px");
       this._el.setAttribute("width", "800px");
@@ -29,7 +65,7 @@
       map.on('springPhotos', this._springPhotos, this);
       map.on('springPhotos', this._reset, this);
 
-      map.on('clearLocation', this._clearCanvas, this);
+      map.on('clearLocation', this.clear, this);
     },
 
     _reset: function() {
@@ -42,10 +78,8 @@
       L.DomUtil.setPosition(this._el, pos);
     },
 
-    _clearCanvas: function() {
-      var ctx = this._el;
-      ctx.innerHTML = "";
-
+    clear: function() {
+      this._el.innerHTML = "";
       currentLocation = null;
     },
 
@@ -61,14 +95,16 @@
         oY = 130, // origin
         r = 200; // radius
 
+      var photos = _.toArray(photos);
+      Photos.reset(photos);
 
-      _.each(_.toArray(photos).slice(0,6), function(photo, index) {
+      _.each(photos.slice(0,6), function(photo, index) {
         if (photo.image_url) {
           var img = new Image();
           img.onload = function() {
             ctx.appendChild(img);
           }
-          console.log(photo.image_url);
+          //console.log(photo.image_url);
           img.src = photo.image_url;
 
             a += 35;
@@ -126,13 +162,11 @@
       });
       
       var nearBy = App.locations.filter(function(obj) {
-        var latLng = obj.marker.getLatLng();
+        var markerLatLng = obj.marker.getLatLng();
 
-        var diffX = Math.abs(obj.loc.x - pos.x);
-        var diffY = Math.abs(obj.loc.y - pos.y);
-        console.log(diffX, diffY);
-        // Crap. Fix later.
-        return (diffX < 10 && diffY < 10);
+        // Take into account the zoom level.
+        var distance = markerLatLng.distanceTo(latLng);
+        return distance < 2500;
       });
 
       if (nearBy.length) {
@@ -175,7 +209,7 @@
 
     map.on('nearLocation', function(data) {
       var url = ['/photos', data.city, data.province].join('/');
-      
+
       if (currentLocation !== url) {
         getPhotos(url);
       }
@@ -203,6 +237,9 @@
 
     var photoLayer = new PhotoLayer();
     map.addLayer(photoLayer);
+
+    var galleryLayer = new GalleryLayer();
+    map.addLayer(galleryLayer);
 
     // Store the locations into an App state variable for easy access later.
     locations.forEach(function(loc) {
