@@ -62,12 +62,8 @@ app.get('/photos/:city/:province/:page?', function(req, res) {
     return ['photo', id].join(':');
   }
 
-  var dataStream = new stream.Stream();
-  dataStream.writable = true;
-  dataStream.write = function(data) {
-    console.log(data);
-    return true;
-  }
+  var count = 0;
+  var images = [];
 
   // Always search for users within this location. The worst we'll do to the
   // 500px API is page through the users results.
@@ -81,9 +77,15 @@ app.get('/photos/:city/:province/:page?', function(req, res) {
         // Add the photo to the location cache.
         client.sadd(locationKey, photo.id);
 
+        count--;
+
         // Add the photo into a hash.
         client.hmset(photoKey(photo.id), "image_url", photo.image_url)
-        dataStream.write(photo);
+        images.push(photo);
+
+        if (count === 0) {
+          res.json(images);
+        }
       });
     });
   }
@@ -94,12 +96,13 @@ app.get('/photos/:city/:province/:page?', function(req, res) {
     }
     var body = JSON.parse(body);
 
+    count = 20;
+
     // Get all users that have an actual city that was passed.
     body.users.forEach(function(user) {
       photosForUser(user);
     });
   });
-  res.send(dataStream);
 });
 
 app.get('/', function(req, res) {
