@@ -218,6 +218,10 @@
           x = oY + r * Math.cos(a * Math.PI / 180);
           y = oY + r * Math.sin(a * Math.PI / 180);
 
+          if (photo.image_url === '/static/img/info-enter.png') {
+            $(img).addClass("info-enter");
+          }
+
           $(img).animate({"marginTop":y},1);
           $(img).animate({"marginLeft":x},1);
           $(img).animate({"opacity":1},300);
