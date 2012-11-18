@@ -71,7 +71,7 @@ var GameController = function(player) {
 var Wisp = function(rect) {
   Wisp.superConstructor.apply(this, arguments);
 
-  this.image = gamejs.image.load("/static/wisp.png");
+  this.image = gamejs.image.load("/static/img/ship-right.png");
   this.rect = new gamejs.Rect(rect);
   this.speed = 250;
   this.angle = null;
@@ -93,7 +93,7 @@ Wisp.prototype.update = function(msDuration) {
 }
 
 var main = function() {
-  var display = gamejs.display.setMode([80, 80]);
+  var display = gamejs.display.setMode([200, 200]);
 
   var wisp = new Wisp([0, 0]);
   var gameController = new GameController(wisp);
@@ -114,6 +114,6 @@ var main = function() {
 }
 
 gamejs.preload([
-  '/static/wisp.png'
+  '/static/img/ship-right.png'
 ]);
 gamejs.ready(main);

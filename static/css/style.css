@@ -53,17 +53,20 @@ p {
     margin:0;
     opacity:0;
     -webkit-transition:.5s ease margin;
+    box-shadow: 2px 2px 8px 0px #000;
 }
 
 .gallery-layer {
+    width: 100% !important;
+    height:100%;
+    top: 0;
+    left: 0;
+    position: absolute;
 }
 
 #gallery-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 600px;
+  width: 100% !important;
+  height:100%;
   overflow: hidden;
 }
 
@@ -81,4 +84,16 @@ p {
   top: 150px;
   left: 0;
   width: 100%;
+}
+
+#gjs-canvas {
+/*    -webkit-animation: myfirst 10s infinite;
+    -webkit-transition:1s ease margin; */
+
+}
+@-webkit-keyframes myfirst /* Safari and Chrome */
+{
+0%   {margin-bottom: 0;}
+50%  {margin-bottom: 10px;}
+100% {margin-bottom: 0;}
 }
