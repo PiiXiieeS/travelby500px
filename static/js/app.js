@@ -248,9 +248,14 @@
     var galleryLayer = new GalleryLayer();
     map.addLayer(galleryLayer);
 
+    var TreasureIcon = new L.Icon({
+      iconUrl: '/static/img/treasure.png',
+      iconSize: [39, 38]
+    });
+
     // Store the locations into an App state variable for easy access later.
     locations.forEach(function(loc) {
-      var marker = L.marker(loc.latLng).addTo(map);
+      var marker = L.marker(loc.latLng, {icon: TreasureIcon}).addTo(map);
       marker._locationData = {
         city: loc.city,
         province: loc.province
