@@ -18,7 +18,9 @@
     onAdd: function(map) {
       this._map = map;
 
-      this._el = L.DomUtil.create('canvas', 'photo-canvas')
+      this._el = L.DomUtil.create('canvas', 'photo-canvas');
+      this._el.width = "800";
+      this._el.height = "800";
       // Make this work with gamejs
       this._el.setAttribute("id", "photo-canvas");
       map.getPanes().overlayPane.appendChild(this._el);
@@ -28,15 +30,33 @@
 
     _springPhotos: function(photos) {
       // Draw the images in some sane way.
-      var ctx = this._el.getContext('2d');
+      var ctx = this._el.getContext('2d'),
+          i = 0,
+          radius = 200,
+          a = 0,
+          imgArray = {};
+
+
       _.each(photos, function(photo, index) {
         var img = new Image();
+
+        a += 45;
+
+        var x = 400 + radius * Math.cos(a * Math.PI / 180);
+        var y = 0 + radius * Math.sin(a * Math.PI / 180);
+
         img.onload = function() {
-          ctx.drawImage(img, 0, 0);
-        }
+          ctx.drawImage(img,x,y);
+        };
+        img.className = "thumb";
         console.log(photo.image_url);
         img.src = photo.image_url;
+
+
       });
+
+
+
     }
   });
 
@@ -85,6 +105,7 @@
 
   var getPhotos = _.debounce(function(url) {
     $.getJSON(url, function(data) {
+        console.log(data);
       map.fire('springPhotos', data);
     });
   }, 600);

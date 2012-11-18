@@ -14,10 +14,31 @@ p {
 
 }
 
-
+/* map style */
 
 #map {
-    padding:10px;
-    height:100%;
+    height:100% !important;
+}
 
+.map-top {
+    top:0;
+    left:0;
+    width:100%;
+    height:
+}
+
+.map-bottom {
+
+}
+
+.map-left {
+
+}
+
+.map-right {
+
+}
+
+.thumb {
+    border:10px solid white;
 }
