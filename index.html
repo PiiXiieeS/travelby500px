@@ -13,11 +13,14 @@
      <script src="/static/js/jquery.js"></script>
      <script src="/static/js/underscore-min.js"></script>
      <script src="/static/js/backbone-min.js"></script>
-
-     <script type='text/javascript' src="/static/js/yabble.js"></script>
-     <script type='text/javascript' src="/static/js/gamejs.min.js"></script>
-     <script type='text/javascript' src="/static/js/game.js"></script>
-     <script type='text/javascript' src="/static/js/app.js"></script>
+     
+     <script type='text/template' id='tm_email'>
+     <div id='email-layer'>
+      <h3>To Whom?</h3>
+      <input type='text' id='gallery-email-input' placeholder='email'>
+      <input type='submit' name='submit' id='gallery-email-submit' value='Yo-ho-ho'>
+     </div>
+     </script>
      <script type='text/template' id='tm_gallery'>
      <div id='gallery-layer'>
         <div class='img-prev'>
@@ -38,10 +41,16 @@
           <h3><%= activeImage.get('user').fullname %></h3>
           <div class='actions'>
             <a class='button' href='http://500px.com/photo/<%= activeImage.get('id') %>'>View On 500px.com</a>
+            <a class='button' id='send-grid'>Email A Matey</a>
           </div>
        </div>
      </div>
      </script>
+
+     <script type='text/javascript' src="/static/js/yabble.js"></script>
+     <script type='text/javascript' src="/static/js/gamejs.min.js"></script>
+     <script type='text/javascript' src="/static/js/game.js"></script>
+     <script type='text/javascript' src="/static/js/app.js"></script>
 
      <script>
      $(function() {

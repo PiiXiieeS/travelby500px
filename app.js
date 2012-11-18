@@ -124,8 +124,6 @@ app.get('/email/:id', function(req, res) {
   fivehundred.photo(options, function(error, response, body) {
     var body = JSON.parse(body);
 
-    console.log(body);
-    
     var context = {
       name: body.photo.name,
       url: body.photo.image_url
@@ -133,13 +131,12 @@ app.get('/email/:id', function(req, res) {
 
     var template = _.template(templates.email);
     var emailBody = template(context);
-    console.log(emailBody);
 
     sendgrid.send({
       to: 'bart.ciszk@gmail.com',
       from: 'pixelhackday@bartek.im',
       subject: 'A 500px Photo - ' + body.photo.name,
-      text: emailBody
+      html: emailBody
     }, function(success, message) {
       console.log(message);
       if (!success) {

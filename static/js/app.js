@@ -31,7 +31,7 @@
       if (!instance || !instance.get('image_url')) {
         return null;
       }
-
+      console.log("Replacing?", instance);
       var url = instance.get('image_url').replace('2.jpg', '4.jpg');
       instance.set({image_url_large: url});
       return instance
@@ -72,23 +72,44 @@
   // A functional photo gallery
   var GalleryView = Backbone.View.extend({
     template: '#tm_gallery',
-    id: "#gallery-layer", 
+    emailTemplate: '#tm_email',
 
-    // Trigger events to move the image gallery. Change the activeImage.
-    events: {
-    },
+    id: "#gallery-layer", 
 
     initialize: function(map) {
       _.bindAll(this);
+      var self = this;
 
       this._map = map;
-
       this.el = $(this.id).hide();
 
+      $(this.el).on("click #send-grid", function() {
+        self.showEmailView();
+      });
+
+      $(this.el).on("click #gallery-email-submit", function() {
+        self.sendEmail();
+      });
+
+      // Whyyyy
       map.on('galleryEnter', this.render, this);
       map.on('galleryEnter', this._bindGallery, this);
       map.on('galleryLeave', this._clear, this);
       map.on('galleryLeave', this._unbindGallery, this);
+    },
+
+    sendEmail: function() {
+      var photo = Photos.activeImage();
+      $.get("/email/" + photo.id, function(resp) {
+        console.log("EmailResponse", resp);
+      });
+      $(this.emailTemplate).hide();
+    },
+
+    showEmailView: function() {
+      var context = {};
+      var template = _.template($(this.emailTemplate).html());
+      $(this.el).append((template(context)));
     },
 
     // Unbind default events, then
@@ -120,9 +141,7 @@
     // Render a template that would display the gallery of images.
     render: function() {
       // Re-adjust the layer.
-      console.log(Photos);
       var context = {
-        images: Photos.models.slice(0, 8),
         activeImage: Photos.activeImage(),
         nextImage: Photos.getNextImage(),
         previousImage: Photos.getPreviousImage()
@@ -275,6 +294,16 @@
     map.off('moveMap');
   }
 
+  App.bindSplashEvents = function(map) {
+    var map = map || App.WorldMap;
+
+    map.on('enterGame', function() {
+      $("#splash").hide("slow");
+      // Setup triggered events
+      App.bindEvents(map);
+    });
+  }
+
   App.bindEvents = function(map) {
     var map = map || App.WorldMap;
 
@@ -353,8 +382,8 @@
       App.locations.push({marker: marker, loc: null});
     });
 
-    // Setup triggered events
-    App.bindEvents(map);
+    // Splash screen events
+    App.bindSplashEvents(map);
 
     // Run this after the app has initialized.
     require.setModuleRoot('./static/js/');

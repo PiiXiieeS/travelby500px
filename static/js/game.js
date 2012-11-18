@@ -21,6 +21,8 @@ var GameController = function(player) {
         WorldMap.fire('galleryEnter');
       } else if (event.key === gamejs.event.K_ESC) {
         WorldMap.fire("galleryLeave");
+      } else if (event.key === gamejs.event.K_SPACE) {
+        WorldMap.fire('enterGame');
       }
     } else if (event.type === gamejs.event.KEY_UP) {
         if (event.key === gamejs.event.K_LEFT) {
