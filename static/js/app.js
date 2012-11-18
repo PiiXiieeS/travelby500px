@@ -17,47 +17,120 @@
   var PhotoModel = Backbone.Model.extend({});
   // Should setup a collection of photos with thumbnail and primary sizes..
   var PhotoCollection = Backbone.Collection.extend({
-    model: PhotoModel
+    model: PhotoModel,
+
+    initialize: function() {
+      this.activeIndex = 0;
+
+      this.on('reset', function() {
+        console.log("Photos reset");
+      });
+    },
+
+    // Hacked image at a certain index
+    imageAtIndex: function(index) {
+      // HACK. Replace the 2.jpg in the activeImage with 4.jpg. Is bigger
+      var instance = this.at(index);
+
+      if (!instance) {
+        return null;
+      }
+
+      var url = instance.get('image_url').replace('2.jpg', '4.jpg');
+      instance.set({image_url_large: url});
+      return instance
+    },
+
+    activeImage: function() {
+      return this.imageAtIndex(this.activeIndex);
+    },
+
+    getNextImage: function() {
+      return this.imageAtIndex(this.activeIndex + 1);
+    },
+
+    getPreviousImage: function() {
+      return this.imageAtIndex(this.activeIndex - 1);
+    },
+
+    nextImage: function() {
+      this.activeIndex += 1;
+      return this.activeImage();
+    },
+
+    previousImage: function() {
+      this.activeIndex -= 1;
+      return this.activeImage();
+    }
   });
   var Photos = new PhotoCollection();
 
-  var GalleryLayer = L.Class.extend({
+  // A functional photo gallery
+  var GalleryView = Backbone.View.extend({
     template: '#tm_gallery',
+    id: "#gallery-layer", 
 
-    onAdd: function(map) {
+    // Trigger events to move the image gallery. Change the activeImage.
+    events: {
+
+    },
+
+    initialize: function(map) {
+      _.bindAll(this);
+
       this._map = map;
 
-      this._el = L.DomUtil.create('div', 'gallery-layer');
-      L.DomUtil.setPosition(this._el, [0, 0]);
+      this.el = $(this.id).hide();
 
-      $(this._el).css("width", "800px");
-      map.getPanes().overlayPane.appendChild(this._el);
-
-      map.on('galleryEnter', this._draw, this);
+      map.on('galleryEnter', this.render, this);
+      map.on('galleryEnter', this._bindGallery, this);
       map.on('galleryLeave', this._clear, this);
+      map.on('galleryLeave', this._unbindGallery, this);
+    },
+
+    // Unbind default events, then
+    _bindGallery: function() {
+      App.unbindEvents(map);
+      var self = this;
+
+      map.on('moveMap', _.debounce(function(direction) {
+        console.log('moveMap.Gallery');
+        if (direction.left) {
+          Photos.previousImage();
+          self.render();
+        } else if (direction.right) {
+          Photos.nextImage();
+          self.render();
+        }
+      }, 100));
+    },
+
+    _unbindGallery: function() {
+      map.off('moveMap')
+      App.bindEvents(map);
     },
 
     _clear: function() {
-      $(this._el).html("");
+      $(this.el).html("").hide();;
     },
 
     // Render a template that would display the gallery of images.
-    _draw: function() {
+    render: function() {
       // Re-adjust the layer.
-      var galleryLayer = new GalleryLayer();
-      map.addLayer(galleryLayer);
-      this._el = L.DomUtil.create('div', 'gallery-layer');
-
-      L.DomUtil.setPosition(this._el, [0, 0]);
+      console.log(Photos);
       var context = {
-        images: Photos.models.slice(0, 6),
-        activeImage: Photos.at(0).toJSON()
+        images: Photos.models.slice(0, 8),
+        activeImage: Photos.activeImage(),
+        nextImage: Photos.getNextImage(),
+        previousImage: Photos.getPreviousImage()
       }
+      console.log(context);
       var template = _.template($(this.template).html());
-      $(this._el).html(template(context));
+      $(this.el).html(template(context)).show();;
     }
   });
 
+  // Display a circle of photos.
   var PhotoLayer = L.Class.extend({
     onAdd: function(map) {
       this._map = map;
@@ -79,6 +152,7 @@
       var latLng = this._map.getCenter();
       var pos = this._map.latLngToLayerPoint(latLng);
 
+      // What is this for again?
       pos.x -= 180;
       pos.y -= 300;
 
@@ -86,15 +160,20 @@
     },
 
     clear: function() {
-      this._el.innerHTML = "";
+      var el = this._el;
+
+      _.delay(function() {
+        $(el).fadeOut(function() {
+          $(el).html("");
+        });
+      }, 500);
       currentLocation = null;
     },
 
     _springPhotos: function(photos) {
+      $(this._el).show();
       // Draw the images in some sane way.
       var ctx = this._el;
-      var dX = (140 / 3.5);
-      var dY = 5; // (140 / 3.5);
 
       var a = 0, x,y;
 
@@ -105,39 +184,30 @@
       var photos = _.toArray(photos);
       Photos.reset(photos);
 
-      _.each(photos.slice(0,6), function(photo, index) {
+      // lame hax!
+      var infoEnter = {};
+      infoEnter.image_url = '/static/img/info-enter.png'
+
+      var toDisplay = photos.slice(0, 8);
+      toDisplay.push(infoEnter);
+
+      _.each(toDisplay, function(photo, index) {
         if (photo.image_url) {
           var img = new Image();
           img.onload = function() {
             ctx.appendChild(img);
           }
-          //console.log(photo.image_url);
           img.src = photo.image_url;
 
-            a += 35;
-            x = oY + r * Math.cos(a * Math.PI / 180);
-            y = oY + r * Math.sin(a * Math.PI / 180);
+          a += 35;
+          x = oY + r * Math.cos(a * Math.PI / 180);
+          y = oY + r * Math.sin(a * Math.PI / 180);
 
-            $(img).animate({"marginTop":y},1);
-            $(img).animate({"marginLeft":x},1);
-            $(img).animate({"opacity":1},300);
-
+          $(img).animate({"marginTop":y},1);
+          $(img).animate({"marginLeft":x},1);
+          $(img).animate({"opacity":1},300);
         }
       });
-
-
-
-        $('#photo-canvas img').each(function(img){
-
-
-          console.log(img);
-            console.log("?");
-
-          $(img).css("marginTop",y);
-          $(img).css("marginTop",x);
-
-      });
-
     }
   });
 
@@ -167,13 +237,19 @@
       App.locations.forEach(function(obj) {
         obj.loc = map.latLngToLayerPoint(obj.marker.getLatLng());
       });
+
+      var maxZoom = map.getMaxZoom() + 1;
+      var reverseZoom = (maxZoom - map.getZoom());
       
       var nearBy = App.locations.filter(function(obj) {
         var markerLatLng = obj.marker.getLatLng();
 
         // Take into account the zoom level.
         var distance = markerLatLng.distanceTo(latLng);
-        return distance < 2500;
+        console.log("Distance to ", obj.marker._locationData, distance);
+
+        // The further out the we're zoomed in the more loose this should be.
+        return (distance / reverseZoom) < (30 * reverseZoom);
       });
 
       if (nearBy.length) {
@@ -192,9 +268,17 @@
     });
   }, 600);
 
-  var mapEvents = function(map) {
+  App.unbindEvents = function(map) {
+    var map = map || App.WorldMap;
+    map.off('moveMap');
+  }
+
+  App.bindEvents = function(map) {
+    var map = map || App.WorldMap;
+
     var speed = 4;
     map.on('moveMap', function(directions) {
+      console.log('moveMap.Default');
       if (directions.up && directions.right) {
         map.panBy([speed, -speed]);
       } else if (directions.up && directions.left) {
@@ -225,16 +309,17 @@
   }
 
   App.init = function(options) {
-    var startLatLng = [43.6529206, -79.384900];
+    var startLatLng = [43.6229206, -79.374900];
 
     App.WorldMap = map = L.map('map', {
       keyboard: false
-    }).setView(startLatLng, 13);
+    }).setView(startLatLng, 12);
 
     var locations = JSON.parse(options.locations);
 
-    L.tileLayer('http://{s}.tile.cloudmade.com/56864ad5a09d4398a7b5a6c79c3d64aa/72865/256/{z}/{x}/{y}.png', {
-      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+
+    L.tileLayer('http://{s}.tile.cloudmade.com/56864ad5a09d4398a7b5a6c79c3d64aa/78209/256/{z}/{x}/{y}.png', {
+      attribution: '',
       maxZoom: 18
     }).addTo(map);
 
@@ -245,12 +330,16 @@
     var photoLayer = new PhotoLayer();
     map.addLayer(photoLayer);
 
-    var galleryLayer = new GalleryLayer();
-    map.addLayer(galleryLayer);
+    var galleryView = new GalleryView(map);
+
+    var TreasureIcon = new L.Icon({
+      iconUrl: '/static/img/treasure.png',
+      iconSize: [39, 38]
+    });
 
     // Store the locations into an App state variable for easy access later.
     locations.forEach(function(loc) {
-      var marker = L.marker(loc.latLng).addTo(map);
+      var marker = L.marker(loc.latLng, {icon: TreasureIcon}).addTo(map);
       marker._locationData = {
         city: loc.city,
         province: loc.province
@@ -259,7 +348,7 @@
     });
 
     // Setup triggered events
-    mapEvents(map);
+    App.bindEvents(map);
 
     // Run this after the app has initialized.
     require.setModuleRoot('./static/js/');

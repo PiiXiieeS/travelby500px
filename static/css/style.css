@@ -24,7 +24,7 @@ p {
     top:0;
     left:0;
     width:100%;
-    height:
+
 }
 
 .map-bottom {
@@ -56,35 +56,77 @@ p {
     box-shadow: 2px 2px 8px 0px #000;
 }
 
-.gallery-layer {
-    width: 100% !important;
-    height:100%;
-    top: 0;
-    left: 0;
-    position: absolute;
-}
-
 #gallery-layer {
-  width: 100% !important;
+  width: 100%;
   height:100%;
   overflow: hidden;
-}
-
-#gallery-layer ul {
-  list-style-type: none;
-  float: left;
-}
-
-#gallery-layer ul li {
-  display: inline;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  background-color: #eee;
 }
 
 #gallery-layer #gallery-primary {
+  padding: 0;
   position: absolute;
-  top: 150px;
+  top: 0;
   left: 0;
   width: 100%;
 }
+
+#gallery-primary .display {
+  text-align: center;
+}
+
+#gallery-primary img {
+  -webkit-box-shadow: 2px 2px 8px 0px #000;
+}
+
+#gallery-layer .img-prev {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  width: 100px;
+}
+
+.img-prev img {
+  margin-left: -600px;
+}
+
+#gallery-layer .img-next {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 100px;
+}
+
+#gallery-layer .info {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  text-align: center;
+  height: 80px;
+  width: 100%;
+  background-color: #eee;
+}
+
+#gallery-layer .info h1 {
+  margin: 0;
+}
+
+#gallery-layer .info h3 {
+  margin: 0;
+}
+
+#gallery-layer .actions {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  height: 60px;
+  width: 150px;
+}
+
 
 #gjs-canvas {
 /*    -webkit-animation: myfirst 10s infinite;
@@ -97,6 +139,7 @@ p {
 50%  {margin-bottom: 10px;}
 100% {margin-bottom: 0;}
 }
+
 
 /* SPLASH */
 

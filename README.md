@@ -1,8 +1,18 @@
-Travel Canada with 500px
+Travel with 500px
 ===============
 
-You're a wisp. Travel around Canada and see images created by all the great
-people in this wonderful country.
+You're a pirate! Travel around North America, discovering treasures along the
+way. Within each treasure, you may just find something beautiful!
 
-Ideally, would like to define markers around the map. When the marker is
-activated, we'll display images from this resource. As we get close to a marker, we'll pre-fetch these images so the user isn't waiting around.
+To use
+====
+
+Assumptions are you have node.js and redis-server installed.
+
+* Clone, and cd into app directory
+* npm install
+* cp config.example.js config.js
+* Fill in your 500px API keys within config.js
+* node app.js
+
+Enjoy!

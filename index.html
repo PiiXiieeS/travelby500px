@@ -8,10 +8,10 @@
      <!--[if lte IE 8]>
      <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.ie.css" />
      <![endif]-->
-     <script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
-     <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
-     <script src='http://underscorejs.org/underscore-min.js'></script>
-     <script src='http://backbonejs.org/backbone-min.js'></script>
+     <script src="/static/js/leaflet.js"></script>
+     <script src="/static/js/jquery.js"></script>
+     <script src="/static/js/underscore-min.js"></script>
+     <script src="/static/js/backbone-min.js"></script>
 
      <script type='text/javascript' src="/static/js/yabble.js"></script>
      <script type='text/javascript' src="/static/js/gamejs.min.js"></script>
@@ -19,12 +19,26 @@
      <script type='text/javascript' src="/static/js/app.js"></script>
      <script type='text/template' id='tm_gallery'>
      <div id='gallery-layer'>
-       <ul>
-        <% _.each(images, function(img) { %>
-          <li><img src='<%= img.get("image_url") %>'></li>
-        <% }); %>
-       </ul>
-       <div id='gallery-primary'><img src='<%= activeImage.image_url %>' width='800' height='600'></div>
+        <div class='img-prev'>
+          <% if (previousImage) { %>
+            <img src='<%= previousImage.get('image_url_large') %>'>
+          <% } %>
+        </div>
+       <div id='gallery-primary'>
+        <div class='display'><img src='<%= activeImage.get('image_url_large') %>'></div>
+       </div>
+        <div class='img-next'>
+          <% if (nextImage) { %>
+            <img src='<%= nextImage.get('image_url_large') %>'>
+          <% } %>
+        </div>
+       <div class='info'>
+          <h1><%= activeImage.get('name') %></h1>
+          <h3><%= activeImage.get('user').fullname %></h3>
+          <div class='actions'>
+            <a href='http://500px.com/photo/<%= activeImage.get('id') %>'>View On 500px.com</a>
+          </div>
+       </div>
      </div>
      </script>
 
@@ -35,15 +49,11 @@
        });
      });
      </script>
-     <style type='text/css'>
-     #map {
-       height: 600px;
-     }
-     </style>
   </head>
 <body>
 
 
+<div id="gallery-layer"></div>
 <div id="map"></div>
 <div id="splash">
 
