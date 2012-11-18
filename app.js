@@ -22,20 +22,6 @@ function renderPage(res, template, variables) {
   stream.pipe(res);
 }
 
-// Return information about a specific image.
-app.get('/photos/:id', function(req, res) {
-  var options = {
-    id: req.params.id
-  }
-  fivehundred.photo(options, function(error, response, body) {
-    if (error) {
-      throw error;
-    }
-    var body = JSON.parse(body);
-    res.json(body);
-  });
-});
-
 var findPhotos = function(userOptions, callback) {
   // Images are indexed based on a simple human readable location.
   var city = userOptions.city;
@@ -83,16 +69,23 @@ var findPhotos = function(userOptions, callback) {
 
     // Get all users that have an actual city that was passed.
     body.users.forEach(function(user, index) {
+      console.log("Getting photo for user", user);
       photosForUser(user, (totalUsers - (index + 1)));
     });
   });
 }
 
 // Returns a list of photo ids for the requested location.
-app.get('/photos/:city/:province/:page?', function(req, res) {
+app.get('/photos/:city/:province?/:page?', function(req, res) {
   // Given a location, find photos for it.
   var city = req.params.city.toLowerCase();
-  var province = req.params.province.toLowerCase();
+
+  if (req.params.province) {
+    var province = req.params.province.toLowerCase();
+  } else {
+    var province = "";
+  }
+
   var page = req.params.page || 1;
 
   var locationKey = [city, province].join(':');
@@ -116,6 +109,21 @@ app.get('/photos/:city/:province/:page?', function(req, res) {
     }
   });
 });
+
+// Return information about a specific image.
+app.get('/photo/:id', function(req, res) {
+  var options = {
+    id: req.params.id
+  }
+  fivehundred.photo(options, function(error, response, body) {
+    if (error) {
+      throw error;
+    }
+    var body = JSON.parse(body);
+    res.json(body);
+  });
+});
+
 
 app.get('/', function(req, res) {
   var context = {

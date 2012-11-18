@@ -14,8 +14,9 @@ var FiveHundred = {
       consumer_key: config.consumer_key
     }
     _.extend(qs, options);
-    console.log(qs);
 
+    console.log(url);
+    console.log(qs);
     request.get({
       url: url,
       qs: qs
@@ -29,6 +30,7 @@ var FiveHundred = {
     }
     _.extend(qs, options);
 
+    console.log(url);
     console.log(qs);
     request.get({
       url: url,
