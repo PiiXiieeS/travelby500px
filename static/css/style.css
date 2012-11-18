@@ -63,8 +63,8 @@ p {
   position: absolute;
   top: 0;
   left: 0;
-  border: 2px solid #000;
   z-index: 999;
+  background-color: #eee;
 }
 
 #gallery-layer ul {

@@ -21,21 +21,29 @@
   });
   var Photos = new PhotoCollection();
 
+  // A functional photo gallery
   var GalleryView = Backbone.View.extend({
     template: '#tm_gallery',
     id: "#gallery-layer", 
 
+    // Trigger events to move the image gallery. Change the activeImage.
+    events: {
+
+    },
+
     initialize: function(map) {
+      _.bindAll(this);
+
       this._map = map;
 
-      this.el = $(this.id);
+      this.el = $(this.id).hide();
 
       map.on('galleryEnter', this.render, this);
       map.on('galleryLeave', this._clear, this);
     },
 
     _clear: function() {
-      $(this.el).html("");
+      $(this.el).html("").hide();;
     },
 
     // Render a template that would display the gallery of images.
@@ -43,13 +51,14 @@
       // Re-adjust the layer.
       var context = {
         images: Photos.models.slice(0, 20),
-        activeImage: Photos.at(0).toJSON()
+        activeImage: Photos.at(0)
       }
       var template = _.template($(this.template).html());
-      $(this.el).html(template(context));
+      $(this.el).html(template(context)).show();;
     }
   });
 
+  // Display a circle of photos.
   var PhotoLayer = L.Class.extend({
     onAdd: function(map) {
       this._map = map;
