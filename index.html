@@ -16,34 +16,38 @@
      
      <script type='text/template' id='tm_email'>
      <div id='email-layer'>
-      <h3>To Whom?</h3>
+      <h3>Share ye bounty, but <u>to Whom?</u></h3>
       <input type='text' id='gallery-email-input' placeholder='email'>
       <input type='submit' name='submit' id='gallery-email-submit' value='Yo-ho-ho'>
      </div>
      </script>
      <script type='text/template' id='tm_gallery'>
      <div id='gallery-layer'>
-        <div class='img-prev'>
-          <% if (previousImage) { %>
-            <img src='<%= previousImage.get('image_url_large') %>'>
-          <% } %>
-        </div>
+
        <div id='gallery-primary'>
         <div class='display'><img src='<%= activeImage.get('image_url_large') %>'></div>
        </div>
-        <div class='img-next'>
+         <div class='img-prev'>
+             <% if (previousImage) { %>
+             <img src='<%= previousImage.get('image_url_large') %>'>
+             <% } %>
+         </div>
+         <div class='img-next'>
           <% if (nextImage) { %>
             <img src='<%= nextImage.get('image_url_large') %>'>
           <% } %>
         </div>
        <div class='info'>
-          <h1><%= activeImage.get('name') %></h1>
-          <h3><%= activeImage.get('user').fullname %></h3>
+          <div class="info-text">
+              <h1><%= activeImage.get('name') %></h1>
+            <h3><%= activeImage.get('user').fullname %></h3>
+          </div>
           <div class='actions'>
             <a class='button' href='http://500px.com/photo/<%= activeImage.get('id') %>'>View On 500px.com</a>
             <a class='button' id='send-grid'>Email A Matey</a>
           </div>
-       </div>
+           <div class="esc"><img src="static/img/graphx-18.png"></div>
+       </div>                                                             `
      </div>
      </script>
 
@@ -86,8 +90,12 @@
 
         </div>
     </div>
+    <div class="intro-3">
+        <img src="static/img/graphx-10.png"/>
+        <p>Press space to dive in, matey!</p>
 
-    <img src="static/img/graphx-10.png"/>
+    </div>
+
     <div class="badge">
         <div class="text">
             <h2>Travel By</h2>

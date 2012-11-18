@@ -341,10 +341,10 @@
 
   App.init = function(options) {
     // Toronto
-    // var startLatLng = [43.6229206, -79.374900];
+    var startLatLng = [43.6229206, -79.374900];
 
     // New York
-    var startLatLng = [40.7305991, -73.9465812];
+    //var startLatLng = [40.7305991, -73.9465812];
 
     App.WorldMap = map = L.map('map', {
       keyboard: false
