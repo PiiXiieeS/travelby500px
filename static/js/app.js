@@ -105,7 +105,7 @@
       var photos = _.toArray(photos);
       Photos.reset(photos);
 
-      _.each(photos.slice(0,6), function(photo, index) {
+      _.each(photos.slice(0,20), function(photo, index) {
         if (photo.image_url) {
           var img = new Image();
           img.onload = function() {
@@ -124,20 +124,6 @@
 
         }
       });
-
-
-
-        $('#photo-canvas img').each(function(img){
-
-
-          console.log(img);
-            console.log("?");
-
-          $(img).css("marginTop",y);
-          $(img).css("marginTop",x);
-
-      });
-
     }
   });
 
@@ -167,13 +153,19 @@
       App.locations.forEach(function(obj) {
         obj.loc = map.latLngToLayerPoint(obj.marker.getLatLng());
       });
+
+      var maxZoom = map.getMaxZoom() + 1;
+      var reverseZoom = (maxZoom - map.getZoom());
       
       var nearBy = App.locations.filter(function(obj) {
         var markerLatLng = obj.marker.getLatLng();
 
         // Take into account the zoom level.
         var distance = markerLatLng.distanceTo(latLng);
-        return distance < 2500;
+        console.log("Distance to ", obj.marker._locationData, distance);
+
+        // The further out the we're zoomed in the more loose this should be.
+        return (distance / reverseZoom) < (30 * reverseZoom);
       });
 
       if (nearBy.length) {
@@ -225,11 +217,11 @@
   }
 
   App.init = function(options) {
-    var startLatLng = [43.6529206, -79.384900];
+    var startLatLng = [43.6229206, -79.374900];
 
     App.WorldMap = map = L.map('map', {
       keyboard: false
-    }).setView(startLatLng, 13);
+    }).setView(startLatLng, 12);
 
     var locations = JSON.parse(options.locations);
 
