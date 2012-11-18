@@ -43,9 +43,7 @@
     },
 
     _clearCanvas: function() {
-      var ctx = this._el;
-      ctx.innerHTML = "";
-
+      this._el.innerHTML = "";
       currentLocation = null;
     },
 
@@ -61,7 +59,7 @@
           img.onload = function() {
             ctx.appendChild(img);
           }
-          console.log(photo.image_url);
+          //console.log(photo.image_url);
           img.src = photo.image_url;
         }
       });
@@ -96,13 +94,11 @@
       });
       
       var nearBy = App.locations.filter(function(obj) {
-        var latLng = obj.marker.getLatLng();
+        var markerLatLng = obj.marker.getLatLng();
 
-        var diffX = Math.abs(obj.loc.x - pos.x);
-        var diffY = Math.abs(obj.loc.y - pos.y);
-        console.log(diffX, diffY);
-        // Crap. Fix later.
-        return (diffX < 10 && diffY < 10);
+        // Take into account the zoom level.
+        var distance = markerLatLng.distanceTo(latLng);
+        return distance < 2500;
       });
 
       if (nearBy.length) {
