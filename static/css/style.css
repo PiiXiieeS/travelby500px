@@ -56,13 +56,13 @@ p {
 }
 
 #photo-canvas img {
-  border: 10px solid #FFE66C;
     position:absolute;
     margin:0;
     opacity:0;
     -webkit-transition:.5s ease margin;
     -moz-transition:.5s ease margin;
-    box-shadow: 0px 2px 18px 0px #BA9C1E;
+    box-shadow: 0px 0px 0px 9px #FFE66C;
+    border-radius:100px;
 }
 
 #photo-canvas img.info-enter {
