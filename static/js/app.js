@@ -21,14 +21,46 @@
 
     initialize: function() {
       this.activeIndex = 0;
+
+      this.on('reset', function() {
+        console.log("Photos reset");
+      });
     },
 
-    activeImage: function() {
+    // Hacked image at a certain index
+    imageAtIndex: function(index) {
       // HACK. Replace the 2.jpg in the activeImage with 4.jpg. Is bigger
-      var instance = this.at(this.activeIndex);
+      var instance = this.at(index);
+
+      if (!instance) {
+        return null;
+      }
+
       var url = instance.get('image_url').replace('2.jpg', '4.jpg');
       instance.set({image_url_large: url});
       return instance
+    },
+
+    activeImage: function() {
+      return this.imageAtIndex(this.activeIndex);
+    },
+
+    getNextImage: function() {
+      return this.imageAtIndex(this.activeIndex + 1);
+    },
+
+    getPreviousImage: function() {
+      return this.imageAtIndex(this.activeIndex - 1);
+    },
+
+    nextImage: function() {
+      this.activeIndex += 1;
+      return this.activeImage();
+    },
+
+    previousImage: function() {
+      this.activeIndex -= 1;
+      return this.activeImage();
     }
   });
   var Photos = new PhotoCollection();
@@ -51,7 +83,31 @@
       this.el = $(this.id).hide();
 
       map.on('galleryEnter', this.render, this);
+      map.on('galleryEnter', this._bindGallery, this);
       map.on('galleryLeave', this._clear, this);
+      map.on('galleryLeave', this._unbindGallery, this);
+    },
+
+    // Unbind default events, then
+    _bindGallery: function() {
+      App.unbindEvents(map);
+      var self = this;
+
+      map.on('moveMap', _.debounce(function(direction) {
+        console.log('moveMap.Gallery');
+        if (direction.left) {
+          Photos.previousImage();
+          self.render();
+        } else if (direction.right) {
+          Photos.nextImage();
+          self.render();
+        }
+      }, 100));
+    },
+
+    _unbindGallery: function() {
+      map.off('moveMap')
+      App.bindEvents(map);
     },
 
     _clear: function() {
@@ -63,9 +119,12 @@
       // Re-adjust the layer.
       console.log(Photos);
       var context = {
-        images: Photos.models.slice(0, 20),
-        activeImage: Photos.activeImage()
+        images: Photos.models.slice(0, 8),
+        activeImage: Photos.activeImage(),
+        nextImage: Photos.getNextImage(),
+        previousImage: Photos.getPreviousImage()
       }
+      console.log(context);
       var template = _.template($(this.template).html());
       $(this.el).html(template(context)).show();;
     }
@@ -125,7 +184,14 @@
       var photos = _.toArray(photos);
       Photos.reset(photos);
 
-      _.each(photos.slice(0,20), function(photo, index) {
+      // lame hax!
+      var infoEnter = {};
+      infoEnter.image_url = '/static/img/info-enter.png'
+
+      var toDisplay = photos.slice(0, 8);
+      toDisplay.push(infoEnter);
+
+      _.each(toDisplay, function(photo, index) {
         if (photo.image_url) {
           var img = new Image();
           img.onload = function() {
@@ -133,13 +199,13 @@
           }
           img.src = photo.image_url;
 
-            a += 35;
-            x = oY + r * Math.cos(a * Math.PI / 180);
-            y = oY + r * Math.sin(a * Math.PI / 180);
+          a += 35;
+          x = oY + r * Math.cos(a * Math.PI / 180);
+          y = oY + r * Math.sin(a * Math.PI / 180);
 
-            $(img).animate({"marginTop":y},1);
-            $(img).animate({"marginLeft":x},1);
-            $(img).animate({"opacity":1},300);
+          $(img).animate({"marginTop":y},1);
+          $(img).animate({"marginLeft":x},1);
+          $(img).animate({"opacity":1},300);
         }
       });
     }
@@ -202,9 +268,17 @@
     });
   }, 600);
 
-  var mapEvents = function(map) {
+  App.unbindEvents = function(map) {
+    var map = map || App.WorldMap;
+    map.off('moveMap');
+  }
+
+  App.bindEvents = function(map) {
+    var map = map || App.WorldMap;
+
     var speed = 4;
     map.on('moveMap', function(directions) {
+      console.log('moveMap.Default');
       if (directions.up && directions.right) {
         map.panBy([speed, -speed]);
       } else if (directions.up && directions.left) {
@@ -244,7 +318,7 @@
     var locations = JSON.parse(options.locations);
 
     L.tileLayer('http://{s}.tile.cloudmade.com/56864ad5a09d4398a7b5a6c79c3d64aa/78209/256/{z}/{x}/{y}.png', {
-      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+      attribution: '',
       maxZoom: 18
     }).addTo(map);
 
@@ -273,7 +347,7 @@
     });
 
     // Setup triggered events
-    mapEvents(map);
+    App.bindEvents(map);
 
     // Run this after the app has initialized.
     require.setModuleRoot('./static/js/');
