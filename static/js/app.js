@@ -28,6 +28,7 @@
       this._map = map;
 
       this._el = L.DomUtil.create('div', 'gallery-layer');
+      L.DomUtil.setPosition(this._el, [0, 0]);
 
       $(this._el).css("width", "800px");
       map.getPanes().overlayPane.appendChild(this._el);
@@ -42,6 +43,12 @@
 
     // Render a template that would display the gallery of images.
     _draw: function() {
+      // Re-adjust the layer.
+      var galleryLayer = new GalleryLayer();
+      map.addLayer(galleryLayer);
+      this._el = L.DomUtil.create('div', 'gallery-layer');
+
+      L.DomUtil.setPosition(this._el, [0, 0]);
       var context = {
         images: Photos.models.slice(0, 6),
         activeImage: Photos.at(0).toJSON()
