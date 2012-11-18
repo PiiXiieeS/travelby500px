@@ -16,7 +16,10 @@ app.use(express.bodyParser());
 // Sourced via: http://nominatim.openstreetmap.org/search/?format=json&city=Toronto
 var locations = [
   {city: 'Toronto', province: 'Ontario', latLng: [43.6529206, -79.384900]},
-  {city: 'Montreal', province: 'Quebec', latLng: [45.5224507, -73.5912827]}
+  {city: 'Montreal', province: 'Quebec', latLng: [45.5224507, -73.5912827]},
+  {city: 'Burlington', province: 'Ontario', latLng: [43.323564, -79.8011553]},
+  {city: 'Scarborough', province: 'Ontario', latLng: [43.7758014, -79.253972]},
+  {city: 'North York', province: 'Ontario', latLng: [43.7709163, -79.4124102]}
 ]
 
 function renderPage(res, template, variables) {
@@ -38,61 +41,46 @@ app.get('/photos/:id', function(req, res) {
     if (error) {
       throw error;
     }
-
     var body = JSON.parse(body);
     res.json(body);
   });
 });
 
-// Returns a list of photo ids for the requested location.
-app.get('/photos/:city/:province/:page?', function(req, res) {
-  // Given a location, find photos for it.
-  var city = req.params.city.toLowerCase();
-  var province = req.params.province.toLowerCase();
-  var page = req.params.page || 1;
-
-  // Cached?
-  client.get("cached", function(err, reply) {
-    res.send(reply);
-  });
-
-  var userOptions = {
-    term: city + ' ' + province,
-    page: page
-  };
-
+var findPhotos = function(userOptions, callback) {
   // Images are indexed based on a simple human readable location.
+  var city = userOptions.city;
+  var province = userOptions.province;
+
   var locationKey = [city, province].join(':');
   var photoKey = function(id) {
     return ['photo', id].join(':');
   }
 
-  var count = 0;
   var images = [];
 
   // Always search for users within this location. The worst we'll do to the
   // 500px API is page through the users results.
-  var photosForUser = function(user) {
+  var photosForUser = function(user, reverseIndex) {
     fivehundred.photos({
       feature: 'user',
       user_id: user.id
     }, function(error, response, body) {
       var body = JSON.parse(body);
+
       body.photos.forEach(function(photo) {
         // Add the photo to the location cache.
-        client.sadd(locationKey, photo.id);
-
-        count--;
+        //client.sadd(locationKey, photo.id);
 
         // Add the photo into a hash.
         client.hmset(photoKey(photo.id), "image_url", photo.image_url)
         images.push(photo);
-
-        if (count === 0) {
-          client.set("cached", JSON.stringify(images));
-          res.json(images);
-        }
       });
+
+      if (reverseIndex === 0) {
+        client.set(locationKey, JSON.stringify(images), redis.print);
+        console.log("Respond w/ images");
+        return callback(images);
+      }
     });
   }
 
@@ -101,13 +89,41 @@ app.get('/photos/:city/:province/:page?', function(req, res) {
       throw error;
     }
     var body = JSON.parse(body);
-
-    count = 20;
+    var totalUsers = body.users.length;
 
     // Get all users that have an actual city that was passed.
-    body.users.forEach(function(user) {
-      photosForUser(user);
+    body.users.forEach(function(user, index) {
+      photosForUser(user, (totalUsers - (index + 1)));
     });
+  });
+}
+
+// Returns a list of photo ids for the requested location.
+app.get('/photos/:city/:province/:page?', function(req, res) {
+  // Given a location, find photos for it.
+  var city = req.params.city.toLowerCase();
+  var province = req.params.province.toLowerCase();
+  var page = req.params.page || 1;
+
+  var locationKey = [city, province].join(':');
+
+  client.get(locationKey, function(err, reply) {
+    if (reply) {
+      console.log("Cached");
+      res.send(reply);
+    } else {
+      console.log("No cache");
+      // UGH
+      var userOptions = {
+        city: city,
+        province: province,
+        term: city + ' ' + province,
+        page: page
+      };
+      findPhotos(userOptions, function(data) {
+        res.json(data);
+      });
+    }
   });
 });
 
