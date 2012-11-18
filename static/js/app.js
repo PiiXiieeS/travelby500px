@@ -17,7 +17,19 @@
   var PhotoModel = Backbone.Model.extend({});
   // Should setup a collection of photos with thumbnail and primary sizes..
   var PhotoCollection = Backbone.Collection.extend({
-    model: PhotoModel
+    model: PhotoModel,
+
+    initialize: function() {
+      this.activeIndex = 0;
+    },
+
+    activeImage: function() {
+      // HACK. Replace the 2.jpg in the activeImage with 4.jpg. Is bigger
+      var instance = this.at(this.activeIndex);
+      var url = instance.get('image_url').replace('2.jpg', '4.jpg');
+      instance.set({image_url_large: url});
+      return instance
+    }
   });
   var Photos = new PhotoCollection();
 
@@ -49,9 +61,10 @@
     // Render a template that would display the gallery of images.
     render: function() {
       // Re-adjust the layer.
+      console.log(Photos);
       var context = {
         images: Photos.models.slice(0, 20),
-        activeImage: Photos.at(0)
+        activeImage: Photos.activeImage()
       }
       var template = _.template($(this.template).html());
       $(this.el).html(template(context)).show();;
@@ -115,7 +128,6 @@
           img.onload = function() {
             ctx.appendChild(img);
           }
-          //console.log(photo.image_url);
           img.src = photo.image_url;
 
             a += 35;

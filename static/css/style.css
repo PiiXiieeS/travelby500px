@@ -80,9 +80,17 @@ p {
 
 #gallery-layer #gallery-primary {
   position: absolute;
-  top: 150px;
+  top: 0px;
   left: 0;
   width: 100%;
+}
+
+#gallery-primary .display {
+  float: left;
+}
+
+#gallery-primary .actions {
+  float: right;
 }
 
 #gjs-canvas {

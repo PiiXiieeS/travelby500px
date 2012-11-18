@@ -23,7 +23,14 @@
           <li><img src='<%= img.get("image_url") %>'></li>
         <% }); %>
        </ul>
-       <div id='gallery-primary'><img src='<%= activeImage.get('image_url') %>' width='800' height='600'></div>
+       <div id='gallery-primary'>
+        <h1><%= activeImage.get('name') %></h1>
+        <h3><%= activeImage.get('user').fullname %></h3>
+        <div class='display'><img src='<%= activeImage.get('image_url_large') %>'></div>
+        <div class='actions'>
+          <a href='<%= activeImage.get('url') %>'>View On 500px.com</a>
+        </div>
+       </div>
      </div>
      </script>
 
