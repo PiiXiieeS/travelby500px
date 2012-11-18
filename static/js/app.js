@@ -102,9 +102,12 @@
 
     clear: function() {
       var el = this._el;
-      $(el).fadeOut(function() {
-        $(el).html("");
-      });
+
+      _.delay(function() {
+        $(el).fadeOut(function() {
+          $(el).html("");
+        });
+      }, 500);
       currentLocation = null;
     },
 
