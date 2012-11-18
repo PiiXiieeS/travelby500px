@@ -3,7 +3,10 @@ var express = require('express')
   , redis = require('redis')
   , config = require('./config')
   , fivehundred = require('./fivehundred')
-  , locations = require('./locations');
+  , locations = require('./locations')
+  , templates = require('./templates')
+  , _ = require('underscore')
+  , SendGrid = require('sendgrid').SendGrid;
 
 client = redis.createClient();
 
@@ -107,6 +110,43 @@ app.get('/photos/:city/:province?/:page?', function(req, res) {
         res.json(data);
       });
     }
+  });
+});
+
+app.get('/email/:id', function(req, res) {
+  var options = {
+    id: req.params.id
+  }
+
+  var sendgrid = new SendGrid('pixelhackday-bartek', 'pixelhackday');
+
+  // woosh
+  fivehundred.photo(options, function(error, response, body) {
+    var body = JSON.parse(body);
+
+    console.log(body);
+    
+    var context = {
+      name: body.photo.name,
+      url: body.photo.image_url
+    }
+
+    var template = _.template(templates.email);
+    var emailBody = template(context);
+    console.log(emailBody);
+
+    sendgrid.send({
+      to: 'bart.ciszk@gmail.com',
+      from: 'pixelhackday@bartek.im',
+      subject: 'A 500px Photo - ' + body.photo.name,
+      text: emailBody
+    }, function(success, message) {
+      console.log(message);
+      if (!success) {
+        console.log(message);
+      }
+      res.send("Ok");
+    });
   });
 });
 
