@@ -45,7 +45,7 @@ p {
 
 .esc {
     right:0;
-    bottom:10px;
+    bottom:0px;
     position:fixed;;
 }
 
@@ -411,7 +411,14 @@ input[type="button"] {
 }
 
 .compass {
-    bottom:0;
+    bottom:-3px;
     right:0px;
     position:fixed;
+}
+.leaflet-left .leaflet-control {
+    display:none;
+}
+
+.leaflet-control-attribution {
+    display:none;
 }
