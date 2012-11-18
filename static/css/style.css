@@ -383,3 +383,25 @@ input[type="button"] {
     color:#66A7D3;
     background:   #134E7D;
 }
+
+@-webkit-keyframes spin {
+                    0% {-webkit-transform:rotate(0deg);}
+                    50% {-webkit-transform:rotate(20deg);}
+                    100% {-webkit-transform:rotate(0deg);}
+                }
+.compass .r img
+{
+    -webkit-animation: spin 3s infinite;
+    -moz-animation:    spin 3s infinite;
+    -ms-animation:     spin 3s infinite;
+    -o-animation:      spin 3s infinite;
+
+    position: absolute;
+    margin-top: -210px;
+}
+
+.compass {
+    bottom:0;
+    right:0px;
+    position:fixed;
+}
