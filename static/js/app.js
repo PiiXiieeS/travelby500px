@@ -72,7 +72,6 @@
   // A functional photo gallery
   var GalleryView = Backbone.View.extend({
     template: '#tm_gallery',
-    emailTemplate: '#tm_email',
 
     id: "#gallery-layer", 
 
@@ -83,14 +82,6 @@
       this._map = map;
       this.el = $(this.id).hide();
 
-      $(this.el).on("click #send-grid", function() {
-        self.showEmailView();
-      });
-
-      $(this.el).on("click #gallery-email-submit", function() {
-        self.sendEmail();
-      });
-
       // Whyyyy
       map.on('galleryEnter', this.render, this);
       map.on('galleryEnter', this._bindGallery, this);
@@ -98,18 +89,11 @@
       map.on('galleryLeave', this._unbindGallery, this);
     },
 
-    sendEmail: function() {
+    sendEmail: function(data) {
       var photo = Photos.activeImage();
       $.get("/email/" + photo.id, function(resp) {
         console.log("EmailResponse", resp);
       });
-      $(this.emailTemplate).hide();
-    },
-
-    showEmailView: function() {
-      var context = {};
-      var template = _.template($(this.emailTemplate).html());
-      $(this.el).append((template(context)));
     },
 
     // Unbind default events, then
@@ -140,6 +124,8 @@
 
     // Render a template that would display the gallery of images.
     render: function() {
+      var self = this;
+
       // Re-adjust the layer.
       var context = {
         activeImage: Photos.activeImage(),
@@ -148,6 +134,13 @@
       }
       var template = _.template($(this.template).html());
       $(this.el).html(template(context)).show("slow");
+
+      $("#gallery-share").on("click", function() {
+        var email = window.prompt("To Whom?", "Yo-ho-ho");
+        if (email) {
+          self.sendEmail({email: email});
+        }
+      });
     }
   });
 
