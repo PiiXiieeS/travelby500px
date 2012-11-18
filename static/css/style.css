@@ -42,3 +42,15 @@ p {
 .thumb {
     border:10px solid white;
 }
+
+#photo-canvas {
+
+}
+
+#photo-canvas img {
+  border: 10px solid white;
+    position:absolute;
+    margin:0;
+    opacity:0;
+    -webkit-transition:.5s ease margin;
+}

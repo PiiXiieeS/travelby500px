@@ -18,44 +18,82 @@
     onAdd: function(map) {
       this._map = map;
 
-      this._el = L.DomUtil.create('canvas', 'photo-canvas');
-      this._el.width = "800";
-      this._el.height = "800";
+      this._el = L.DomUtil.create('div', 'photo-canvas')
       // Make this work with gamejs
       this._el.setAttribute("id", "photo-canvas");
+      this._el.setAttribute("height", "600px");
+      this._el.setAttribute("width", "800px");
+
       map.getPanes().overlayPane.appendChild(this._el);
 
       map.on('springPhotos', this._springPhotos, this);
+      map.on('springPhotos', this._reset, this);
+
+      map.on('clearLocation', this._clearCanvas, this);
+    },
+
+    _reset: function() {
+      var latLng = this._map.getCenter();
+      var pos = this._map.latLngToLayerPoint(latLng);
+
+      pos.x -= 180;
+      pos.y -= 300;
+
+      L.DomUtil.setPosition(this._el, pos);
+    },
+
+    _clearCanvas: function() {
+      var ctx = this._el;
+      ctx.innerHTML = "";
+
+      currentLocation = null;
     },
 
     _springPhotos: function(photos) {
       // Draw the images in some sane way.
-      var ctx = this._el.getContext('2d'),
-          i = 0,
-          radius = 200,
-          a = 0,
-          imgArray = {};
+      var ctx = this._el;
+      var dX = (140 / 3.5);
+      var dY = 5; // (140 / 3.5);
+
+      var a = 0, x,y;
+
+      var oX = 20,
+        oY = 130, // origin
+        r = 200; // radius
 
 
-      _.each(photos, function(photo, index) {
-        var img = new Image();
+      _.each(_.toArray(photos).slice(0,6), function(photo, index) {
+        if (photo.image_url) {
+          var img = new Image();
+          img.onload = function() {
+            ctx.appendChild(img);
+          }
+          console.log(photo.image_url);
+          img.src = photo.image_url;
 
-        a += 45;
+            a += 35;
+            x = oY + r * Math.cos(a * Math.PI / 180);
+            y = oY + r * Math.sin(a * Math.PI / 180);
 
-        var x = 400 + radius * Math.cos(a * Math.PI / 180);
-        var y = 0 + radius * Math.sin(a * Math.PI / 180);
+            $(img).animate({"marginTop":y},1);
+            $(img).animate({"marginLeft":x},1);
+            $(img).animate({"opacity":1},300);
 
-        img.onload = function() {
-          ctx.drawImage(img,x,y);
-        };
-        img.className = "thumb";
-        console.log(photo.image_url);
-        img.src = photo.image_url;
-
-
+        }
       });
 
 
+
+        $('#photo-canvas img').each(function(img){
+
+
+          console.log(img);
+            console.log("?");
+
+          $(img).css("marginTop",y);
+          $(img).css("marginTop",x);
+
+      });
 
     }
   });
@@ -88,6 +126,8 @@
       });
       
       var nearBy = App.locations.filter(function(obj) {
+        var latLng = obj.marker.getLatLng();
+
         var diffX = Math.abs(obj.loc.x - pos.x);
         var diffY = Math.abs(obj.loc.y - pos.y);
         console.log(diffX, diffY);
@@ -99,13 +139,14 @@
         var nearBy = nearBy[0];
         console.log("Fire nearLocation", nearBy.marker._locationData);
         map.fire('nearLocation', nearBy.marker._locationData);
+      } else {
+        map.fire('clearLocation');
       }
     }
   });
 
   var getPhotos = _.debounce(function(url) {
     $.getJSON(url, function(data) {
-        console.log(data);
       map.fire('springPhotos', data);
     });
   }, 600);
@@ -151,7 +192,7 @@
 
     var locations = JSON.parse(options.locations);
 
-    L.tileLayer('http://{s}.tile.cloudmade.com/56864ad5a09d4398a7b5a6c79c3d64aa/997/256/{z}/{x}/{y}.png', {
+    L.tileLayer('http://{s}.tile.cloudmade.com/56864ad5a09d4398a7b5a6c79c3d64aa/67367/256/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
       maxZoom: 18
     }).addTo(map);

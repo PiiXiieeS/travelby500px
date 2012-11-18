@@ -51,6 +51,11 @@ app.get('/photos/:city/:province/:page?', function(req, res) {
   var province = req.params.province.toLowerCase();
   var page = req.params.page || 1;
 
+  // Cached?
+  client.get("cached", function(err, reply) {
+    res.send(reply);
+  });
+
   var userOptions = {
     term: city + ' ' + province,
     page: page
@@ -84,6 +89,7 @@ app.get('/photos/:city/:province/:page?', function(req, res) {
         images.push(photo);
 
         if (count === 0) {
+          client.set("cached", JSON.stringify(images));
           res.json(images);
         }
       });
