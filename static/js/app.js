@@ -4,6 +4,9 @@
   var App = root.App = {};
 
   var $ = root.jQuery;
+  var _ = root._;
+
+  var currentLocation = null;
 
   // Nasty global for gamejs to take it.
   App.WorldMap = null;
@@ -11,10 +14,33 @@
 
   App.locations = [];
 
-  var GameJsLayer = L.Class.extend({
-    initialize: function (latLng) {
+  var PhotoLayer = L.Class.extend({
+    onAdd: function(map) {
+      this._map = map;
+
+      this._el = L.DomUtil.create('canvas', 'photo-canvas')
+      // Make this work with gamejs
+      this._el.setAttribute("id", "photo-canvas");
+      map.getPanes().overlayPane.appendChild(this._el);
+
+      map.on('springPhotos', this._springPhotos, this);
     },
 
+    _springPhotos: function(photos) {
+      // Draw the images in some sane way.
+      var ctx = this._el.getContext('2d');
+      _.each(photos, function(photo, index) {
+        var img = new Image();
+        img.onload = function() {
+          ctx.drawImage(img, 0, 0);
+        }
+        console.log(photo.image_url);
+        img.src = photo.image_url;
+      });
+    }
+  });
+
+  var GameJsLayer = L.Class.extend({
     onAdd: function(map) {
       this._map = map;
 
@@ -29,7 +55,6 @@
     },
 
     _reset: function() {
-      console.log(this._map);
       // Update layers position.
       var latLng = this._map.getCenter();
       var pos = this._map.latLngToLayerPoint(latLng);
@@ -38,7 +63,6 @@
 
       // Update all App markers with new locations.
       // If this position is near a marker, we should fire a marker found event.
-      //
       App.locations.forEach(function(obj) {
         obj.loc = map.latLngToLayerPoint(obj.marker.getLatLng());
       });
@@ -47,18 +71,26 @@
         var diffX = Math.abs(obj.loc.x - pos.x);
         var diffY = Math.abs(obj.loc.y - pos.y);
         console.log(diffX, diffY);
-        return (diffX < 20 && diffY < 20);
+        // Crap. Fix later.
+        return (diffX < 10 && diffY < 10);
       });
 
       if (nearBy.length) {
-        console.log("Fire nearLocation");
-        map.fire('nearLocation', nearBy[0]);
+        var nearBy = nearBy[0];
+        console.log("Fire nearLocation", nearBy.marker._locationData);
+        map.fire('nearLocation', nearBy.marker._locationData);
       }
     }
   });
 
+  var getPhotos = _.debounce(function(url) {
+    $.getJSON(url, function(data) {
+      map.fire('springPhotos', data);
+    });
+  }, 600);
+
   var mapEvents = function(map) {
-    var speed = 2;
+    var speed = 4;
     map.on('moveMap', function(directions) {
       if (directions.up && directions.right) {
         map.panBy([speed, -speed]);
@@ -78,6 +110,15 @@
         map.panBy([0, speed]);
       }
     });
+
+    map.on('nearLocation', function(data) {
+      var url = ['/photos', data.city, data.province].join('/');
+      
+      if (currentLocation !== url) {
+        getPhotos(url);
+      }
+      currentLocation = url;
+    });
   }
 
   App.init = function(options) {
@@ -95,12 +136,19 @@
     }).addTo(map);
 
     // Setup the canvas for gamejs to draw on.
-    var gameCanvas = new GameJsLayer(startLatLng);
+    var gameCanvas = new GameJsLayer();
     map.addLayer(gameCanvas);
 
-    console.log(locations);
+    var photoLayer = new PhotoLayer();
+    map.addLayer(photoLayer);
+
+    // Store the locations into an App state variable for easy access later.
     locations.forEach(function(loc) {
       var marker = L.marker(loc.latLng).addTo(map);
+      marker._locationData = {
+        city: loc.city,
+        province: loc.province
+      }
       App.locations.push({marker: marker, loc: null});
     });
 
