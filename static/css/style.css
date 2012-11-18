@@ -21,3 +21,7 @@ p {
     height:100%;
 
 }
+
+#photo-canvas img {
+  border: 10px solid red;
+}

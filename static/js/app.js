@@ -18,24 +18,52 @@
     onAdd: function(map) {
       this._map = map;
 
-      this._el = L.DomUtil.create('canvas', 'photo-canvas')
+      this._el = L.DomUtil.create('div', 'photo-canvas')
       // Make this work with gamejs
       this._el.setAttribute("id", "photo-canvas");
+      this._el.setAttribute("height", "600px");
+      this._el.setAttribute("width", "800px");
+
       map.getPanes().overlayPane.appendChild(this._el);
 
       map.on('springPhotos', this._springPhotos, this);
+      map.on('springPhotos', this._reset, this);
+
+      map.on('clearLocation', this._clearCanvas, this);
+    },
+
+    _reset: function() {
+      var latLng = this._map.getCenter();
+      var pos = this._map.latLngToLayerPoint(latLng);
+
+      pos.x -= 180;
+      pos.y -= 300;
+
+      L.DomUtil.setPosition(this._el, pos);
+    },
+
+    _clearCanvas: function() {
+      var ctx = this._el;
+      ctx.innerHTML = "";
+
+      currentLocation = null;
     },
 
     _springPhotos: function(photos) {
       // Draw the images in some sane way.
-      var ctx = this._el.getContext('2d');
+      var ctx = this._el;
+      var dX = (140 / 3.5);
+      var dY = 5; // (140 / 3.5);
+
       _.each(photos, function(photo, index) {
-        var img = new Image();
-        img.onload = function() {
-          ctx.drawImage(img, 0, 0);
+        if (photo.image_url) {
+          var img = new Image();
+          img.onload = function() {
+            ctx.appendChild(img);
+          }
+          console.log(photo.image_url);
+          img.src = photo.image_url;
         }
-        console.log(photo.image_url);
-        img.src = photo.image_url;
       });
     }
   });
@@ -68,6 +96,8 @@
       });
       
       var nearBy = App.locations.filter(function(obj) {
+        var latLng = obj.marker.getLatLng();
+
         var diffX = Math.abs(obj.loc.x - pos.x);
         var diffY = Math.abs(obj.loc.y - pos.y);
         console.log(diffX, diffY);
@@ -79,6 +109,8 @@
         var nearBy = nearBy[0];
         console.log("Fire nearLocation", nearBy.marker._locationData);
         map.fire('nearLocation', nearBy.marker._locationData);
+      } else {
+        map.fire('clearLocation');
       }
     }
   });
