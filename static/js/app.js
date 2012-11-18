@@ -323,6 +323,7 @@
 
     var locations = JSON.parse(options.locations);
 
+
     L.tileLayer('http://{s}.tile.cloudmade.com/56864ad5a09d4398a7b5a6c79c3d64aa/78209/256/{z}/{x}/{y}.png', {
       attribution: '',
       maxZoom: 18

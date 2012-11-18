@@ -7,10 +7,11 @@ html, body {
 }
 
 h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inconsolata';
 }
 
 p {
-
+    font-family: 'Inconsolata';
 }
 
 /* map style */
@@ -23,7 +24,7 @@ p {
     top:0;
     left:0;
     width:100%;
-    height:
+
 }
 
 .map-bottom {
@@ -156,4 +157,101 @@ a.button {
 0%   {margin-bottom: 0;}
 50%  {margin-bottom: 10px;}
 100% {margin-bottom: 0;}
+}
+
+
+/* SPLASH */
+
+#splash {
+    background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,0.59) 0%, rgba(170,170,170,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(255,255,255,0.59)), color-stop(100%,rgba(170,170,170,1))); /* Chrome,Safari4+ */
+    background: -webkit-radial-gradient(center, ellipse cover,  rgba(255,255,255,0.59) 0%,rgba(170,170,170,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-radial-gradient(center, ellipse cover,  rgba(255,255,255,0.59) 0%,rgba(170,170,170,1) 100%); /* Opera 12+ */
+    background: -ms-radial-gradient(center, ellipse cover,  rgba(255,255,255,0.59) 0%,rgba(170,170,170,1) 100%); /* IE10+ */
+    background: radial-gradient(ellipse at center,  rgba(255,255,255,0.59) 0%,rgba(170,170,170,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#96ffffff', endColorstr='#aaaaaa',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+
+    width:100%;
+    height:100%;
+    position: fixed;
+    top:0;
+    left:0;
+}
+
+.pattern {
+    background-image:url('../img/bk-05.png');
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    position:fixed;;
+}
+
+.badge {
+    background:url('../img/graphx-08.png') no-repeat top left;
+    width:567px;
+    height:441px;
+    top:0;
+    left:0;
+    position:fixed;
+}
+    .badge h2 {
+        border-bottom: 1px dotted #134E7D;
+        color: #134E7D;
+        display: inline-block;
+        font-size: 21px;
+        margin: 0 0 0 10px;
+        text-transform: uppercase;
+        width: auto;
+    }
+    .badge h1 {
+        font-weight:normal;
+        font-size:103px;
+        color:#AD0316;
+        text-shadow: -2px 2px 0px #8A000F;
+        margin:41px 0 0 0;
+        line-height: 0;
+
+    }
+    .text {
+        margin:150px 0 0 150px;
+    }
+    .text-2 {
+        width: 300px;
+        display: inline-block;
+        margin: 60px 0 0 160px;
+    }
+.intro {
+    width:300px;
+    background:#FFE66C;
+    width:300px;
+    height:auto;
+    padding:20px 40px 20px 20px;
+    position: fixed;
+    top: 359px;
+    left: 358px;
+}
+
+    .intro p {
+        color:#BA9C1E;
+        font-size:24px;
+        font-weight:bold;
+    }
+
+    .intro span {
+        border-bottom:1px dotted #BA9C1E;
+    }
+
+    .hide {
+        display:none;
+    }
+
+.top-right {
+    background:url('../img/graphx-06.png') no-repeat top left;
+    width:436px;
+    height:418px;
+    top:0;
+    right:0;
+    position:fixed;
 }
