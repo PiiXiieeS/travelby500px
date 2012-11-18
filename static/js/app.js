@@ -21,40 +21,32 @@
   });
   var Photos = new PhotoCollection();
 
-  var GalleryLayer = L.Class.extend({
+  var GalleryView = Backbone.View.extend({
     template: '#tm_gallery',
+    id: "#gallery-layer", 
 
-    onAdd: function(map) {
+    initialize: function(map) {
       this._map = map;
 
-      this._el = L.DomUtil.create('div', 'gallery-layer');
-      L.DomUtil.setPosition(this._el, [0, 0]);
+      this.el = $(this.id);
 
-      $(this._el).css("width", "800px");
-      map.getPanes().overlayPane.appendChild(this._el);
-
-      map.on('galleryEnter', this._draw, this);
+      map.on('galleryEnter', this.render, this);
       map.on('galleryLeave', this._clear, this);
     },
 
     _clear: function() {
-      $(this._el).html("");
+      $(this.el).html("");
     },
 
     // Render a template that would display the gallery of images.
-    _draw: function() {
+    render: function() {
       // Re-adjust the layer.
-      var galleryLayer = new GalleryLayer();
-      map.addLayer(galleryLayer);
-      this._el = L.DomUtil.create('div', 'gallery-layer');
-
-      L.DomUtil.setPosition(this._el, [0, 0]);
       var context = {
-        images: Photos.models.slice(0, 6),
+        images: Photos.models.slice(0, 20),
         activeImage: Photos.at(0).toJSON()
       }
       var template = _.template($(this.template).html());
-      $(this._el).html(template(context));
+      $(this.el).html(template(context));
     }
   });
 
@@ -79,6 +71,7 @@
       var latLng = this._map.getCenter();
       var pos = this._map.latLngToLayerPoint(latLng);
 
+      // What is this for again?
       pos.x -= 180;
       pos.y -= 300;
 
@@ -86,15 +79,17 @@
     },
 
     clear: function() {
-      this._el.innerHTML = "";
+      var el = this._el;
+      $(el).fadeOut(function() {
+        $(el).html("");
+      });
       currentLocation = null;
     },
 
     _springPhotos: function(photos) {
+      $(this._el).show();
       // Draw the images in some sane way.
       var ctx = this._el;
-      var dX = (140 / 3.5);
-      var dY = 5; // (140 / 3.5);
 
       var a = 0, x,y;
 
@@ -121,7 +116,6 @@
             $(img).animate({"marginTop":y},1);
             $(img).animate({"marginLeft":x},1);
             $(img).animate({"opacity":1},300);
-
         }
       });
     }
@@ -237,8 +231,7 @@
     var photoLayer = new PhotoLayer();
     map.addLayer(photoLayer);
 
-    var galleryLayer = new GalleryLayer();
-    map.addLayer(galleryLayer);
+    var galleryView = new GalleryView(map);
 
     var TreasureIcon = new L.Icon({
       iconUrl: '/static/img/treasure.png',

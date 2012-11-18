@@ -118,7 +118,6 @@ app.get('/photos/:city/:province/:page?', function(req, res) {
 });
 
 app.get('/', function(req, res) {
-  console.log(locations);
   var context = {
     locations: JSON.stringify(locations)
   }
