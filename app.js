@@ -117,7 +117,7 @@ app.get('/email/:id', function(req, res) {
   var options = {
     id: req.params.id
   }
-
+  var email = req.query.email;
   var sendgrid = new SendGrid('pixelhackday-bartek', 'pixelhackday');
 
   // woosh
@@ -133,7 +133,7 @@ app.get('/email/:id', function(req, res) {
     var emailBody = template(context);
 
     sendgrid.send({
-      to: 'bart.ciszk@gmail.com',
+      to: email,
       from: 'pixelhackday@bartek.im',
       subject: 'A 500px Photo - ' + body.photo.name,
       html: emailBody
