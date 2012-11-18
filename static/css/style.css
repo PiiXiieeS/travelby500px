@@ -64,15 +64,11 @@ p {
     box-shadow: 0px 2px 18px 0px #BA9C1E;
 }
 
-#photo-canvas img:last-of-type {
+#photo-canvas img.info-enter {
     border:none;
     box-shadow: none;
 }
 
-#photo-canvas img:last-child {
-    border:none;
-    box-shadow: none;
-}
 
 #gallery-layer {
   width: 100%;
@@ -352,8 +348,27 @@ a.button {
     width:436px;
     height:418px;
     top:0;
-    right:0;
+    right:-84px;
     position:fixed;
+}
+
+.bottom-left {
+    background:url('../img/graphx-20.png') no-repeat bottom left;
+    bottom:0;
+    left:0;
+    position: fixed;
+    width:571px;
+    height:441px;
+}
+
+.logo {
+    background:url('../img/graphx-21.png') no-repeat top left;
+    top:0;
+    left:0;
+    position: fixed;
+    width:503px;
+    height:378px;
+
 }
 
 input[type="button"] {
@@ -363,4 +378,26 @@ input[type="button"] {
     font-size: 13px;
     color:#66A7D3;
     background:   #134E7D;
+}
+
+@-webkit-keyframes spin {
+                    0% {-webkit-transform:rotate(0deg);}
+                    50% {-webkit-transform:rotate(20deg);}
+                    100% {-webkit-transform:rotate(0deg);}
+                }
+.compass .r img
+{
+    -webkit-animation: spin 3s infinite;
+    -moz-animation:    spin 3s infinite;
+    -ms-animation:     spin 3s infinite;
+    -o-animation:      spin 3s infinite;
+
+    position: absolute;
+    margin-top: -210px;
+}
+
+.compass {
+    bottom:0;
+    right:0px;
+    position:fixed;
 }
