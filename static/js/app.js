@@ -31,7 +31,6 @@
       if (!instance || !instance.get('image_url')) {
         return null;
       }
-
       console.log("Replacing?", instance);
       var url = instance.get('image_url').replace('2.jpg', '4.jpg');
       instance.set({image_url_large: url});
@@ -88,6 +87,10 @@
         self.showEmailView();
       });
 
+      $(this.el).on("click #gallery-email-submit", function() {
+        self.sendEmail();
+      });
+
       // Whyyyy
       map.on('galleryEnter', this.render, this);
       map.on('galleryEnter', this._bindGallery, this);
@@ -95,11 +98,18 @@
       map.on('galleryLeave', this._unbindGallery, this);
     },
 
+    sendEmail: function() {
+      var photo = Photos.activeImage();
+      $.get("/email/" + photo.id, function(resp) {
+        console.log("EmailResponse", resp);
+      });
+      $(this.emailTemplate).hide();
+    },
+
     showEmailView: function() {
       var context = {};
       var template = _.template($(this.emailTemplate).html());
       $(this.el).append((template(context)));
-      console.log("Ok");
     },
 
     // Unbind default events, then
@@ -132,7 +142,6 @@
     render: function() {
       // Re-adjust the layer.
       var context = {
-        images: Photos.models.slice(0, 8),
         activeImage: Photos.activeImage(),
         nextImage: Photos.getNextImage(),
         previousImage: Photos.getPreviousImage()

@@ -256,3 +256,18 @@ a.button {
     right:0;
     position:fixed;
 }
+
+#email-layer {
+  position: absolute;
+  top: 200px;
+  left: 400px;
+  z-index: 9999;
+  background-color: #fff;
+  color: #000;
+  width: 250px;
+  height: 100px;
+  text-align: center;
+
+
+
+}
