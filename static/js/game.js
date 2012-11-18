@@ -5,8 +5,8 @@ var gamejs = require('gamejs')
 var WorldMap = App.WorldMap;
 
 var Animation = function(spriteSheet, animationSpec, fps) {
-  this.fps = fps || 6;
-  this.frameDuration = 1000 / this.fps;
+  this.fps = fps || 2;
+  this.frameDuration = 200;
   this.spec = animationSpec;
   
   this.currentFrame = null;
@@ -137,6 +137,8 @@ var Wisp = function(rect, spriteSheet, animation) {
 gamejs.utils.objects.extend(Wisp, gamejs.sprite.Sprite);
 
 Wisp.prototype.update = function(msDuration) {
+    this.animation.update(msDuration);
+    this.image = this.animation.image;
     // Move the map when the player is near the bounding boxes.
     if (this.angle !== null) {
       /*
@@ -154,10 +156,10 @@ var main = function() {
   var gameController = new GameController(wisp);
 
   // Animate!
-  var dimensions = {width: 131, height: 137}
-  var spriteSheet = new SpriteSheet('/static/img/ship-right.png', dimensions);
+  var dimensions = {width: 150, height: 175}
+  var spriteSheet = new SpriteSheet('/static/img/boat.png', dimensions);
   var animation = {
-    'sailing': [0]
+    'sailing': [0, 1, 2, 4]
   }
 
   var wisp = new Wisp([0, 0], spriteSheet, animation);
@@ -178,6 +180,7 @@ var main = function() {
 }
 
 gamejs.preload([
-  '/static/img/ship-right.png'
+  '/static/img/ship-right.png',
+  '/static/img/boat.png'
 ]);
 gamejs.ready(main);
