@@ -223,11 +223,10 @@ a.button {
         margin: 60px 0 0 160px;
     }
 .intro {
-    width:300px;
     background:#FFE66C;
-    width:300px;
+    width:308px;
     height:auto;
-    padding:20px 40px 20px 20px;
+    padding:20px 33px 14px 20px;
     position: fixed;
     top: 359px;
     left: 358px;
@@ -243,8 +242,33 @@ a.button {
         border-bottom:1px dotted #BA9C1E;
     }
 
+    .treaser {
+        background:url('../img/graphx-11.png') repeat-x;
+        width:100%;
+        height:25px;
+    }
+
     .hide {
         display:none;
+    }
+
+.intro-2 {
+    width: 132px;
+    height: auto;
+    padding: 47px 20px 20px 20px;
+    position: fixed;
+    top: 359px;
+    left: 719px;
+    background: #134E7D;
+
+}
+
+    .intro-2 p {
+        color:#66A7D3;
+        font-size:13px;
+        text-align: center;
+        font-weight:bold;
+        text-transform: uppercase;
     }
 
 .top-right {
