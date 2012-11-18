@@ -25,3 +25,31 @@ p {
 #photo-canvas img {
   border: 10px solid red;
 }
+
+.gallery-layer {
+}
+
+#gallery-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 600px;
+  overflow: hidden;
+}
+
+#gallery-layer ul {
+  list-style-type: none;
+  float: left;
+}
+
+#gallery-layer ul li {
+  display: inline;
+}
+
+#gallery-layer #gallery-primary {
+  position: absolute;
+  top: 150px;
+  left: 0;
+  width: 100%;
+}

@@ -14,12 +14,48 @@
 
   App.locations = [];
 
+  var PhotoModel = Backbone.Model.extend({});
+  // Should setup a collection of photos with thumbnail and primary sizes..
+  var PhotoCollection = Backbone.Collection.extend({
+    model: PhotoModel
+  });
+  var Photos = new PhotoCollection();
+
+  var GalleryLayer = L.Class.extend({
+    template: '#tm_gallery',
+
+    onAdd: function(map) {
+      this._map = map;
+
+      this._el = L.DomUtil.create('div', 'gallery-layer');
+
+      $(this._el).css("width", "800px");
+      map.getPanes().overlayPane.appendChild(this._el);
+
+      map.on('galleryEnter', this._draw, this);
+      map.on('galleryLeave', this._clear, this);
+    },
+
+    _clear: function() {
+      $(this._el).html("");
+    },
+
+    // Render a template that would display the gallery of images.
+    _draw: function() {
+      var context = {
+        images: Photos.models.slice(0, 6),
+        activeImage: Photos.at(0).toJSON()
+      }
+      var template = _.template($(this.template).html());
+      $(this._el).html(template(context));
+    }
+  });
+
   var PhotoLayer = L.Class.extend({
     onAdd: function(map) {
       this._map = map;
 
       this._el = L.DomUtil.create('div', 'photo-canvas')
-      // Make this work with gamejs
       this._el.setAttribute("id", "photo-canvas");
       this._el.setAttribute("height", "600px");
       this._el.setAttribute("width", "800px");
@@ -29,7 +65,7 @@
       map.on('springPhotos', this._springPhotos, this);
       map.on('springPhotos', this._reset, this);
 
-      map.on('clearLocation', this._clearCanvas, this);
+      map.on('clearLocation', this.clear, this);
     },
 
     _reset: function() {
@@ -42,7 +78,7 @@
       L.DomUtil.setPosition(this._el, pos);
     },
 
-    _clearCanvas: function() {
+    clear: function() {
       this._el.innerHTML = "";
       currentLocation = null;
     },
@@ -52,6 +88,9 @@
       var ctx = this._el;
       var dX = (140 / 3.5);
       var dY = 5; // (140 / 3.5);
+
+      var photos = _.toArray(photos);
+      Photos.reset(photos);
 
       _.each(photos, function(photo, index) {
         if (photo.image_url) {
@@ -141,7 +180,7 @@
 
     map.on('nearLocation', function(data) {
       var url = ['/photos', data.city, data.province].join('/');
-      
+
       if (currentLocation !== url) {
         getPhotos(url);
       }
@@ -169,6 +208,9 @@
 
     var photoLayer = new PhotoLayer();
     map.addLayer(photoLayer);
+
+    var galleryLayer = new GalleryLayer();
+    map.addLayer(galleryLayer);
 
     // Store the locations into an App state variable for easy access later.
     locations.forEach(function(loc) {

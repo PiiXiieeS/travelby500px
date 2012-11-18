@@ -5,7 +5,7 @@ var WorldMap = App.WorldMap;
 
 var GameController = function(player) {
   this.player = player;
-  this.up = this.down = this.left = this.right = false;
+  this.enter = this.up = this.down = this.left = this.right = false;
 
   this.handle = function(event) {
     if (event.type === gamejs.event.KEY_DOWN) {
@@ -17,6 +17,10 @@ var GameController = function(player) {
         this.up = true;
       } else if (event.key === gamejs.event.K_DOWN) {
         this.down = true;
+      } else if (event.key === gamejs.event.K_ENTER) {
+        WorldMap.fire('galleryEnter');
+      } else if (event.key === gamejs.event.K_ESC) {
+        WorldMap.fire("galleryLeave");
       }
     } else if (event.type === gamejs.event.KEY_UP) {
         if (event.key === gamejs.event.K_LEFT) {
